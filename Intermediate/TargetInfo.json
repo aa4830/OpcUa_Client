@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "Opcua_Unreal_Client",
+			"Path": "..\\Source\\Opcua_Unreal_Client.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "Opcua_Unreal_ClientEditor",
+			"Path": "..\\Source\\Opcua_Unreal_ClientEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}

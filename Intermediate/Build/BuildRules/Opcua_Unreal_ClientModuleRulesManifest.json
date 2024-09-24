@@ -1,0 +1,8 @@
+{
+	"SourceFiles": [
+		"C:\\Work\\Opcua_Unreal_Client\\Source\\Opcua_Unreal_Client\\Opcua_Unreal_Client.Build.cs",
+		"C:\\Work\\Opcua_Unreal_Client\\Source\\Opcua_Unreal_Client.Target.cs",
+		"C:\\Work\\Opcua_Unreal_Client\\Source\\Opcua_Unreal_ClientEditor.Target.cs"
+	],
+	"EngineVersion": "5.4.4"
+}

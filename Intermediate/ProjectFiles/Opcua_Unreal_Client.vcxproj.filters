@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\Opcua_Unreal_Client.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\Opcua_Unreal_Client.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\Opcua_Unreal_ClientEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\.vsconfig" />
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\Opcua_Unreal_Client">
+      <UniqueIdentifier>{F52F02DC-B4B6-346A-BFA3-82A809F4521C}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\Opcua_Unreal_Client\MyActor.cpp">
+      <Filter>Source\Opcua_Unreal_Client</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\Opcua_Unreal_Client\MyActor.h">
+      <Filter>Source\Opcua_Unreal_Client</Filter>
+    </ClInclude>
+    <None Include="..\..\Source\Opcua_Unreal_Client\Opcua_Unreal_Client.Build.cs">
+      <Filter>Source\Opcua_Unreal_Client</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\Opcua_Unreal_Client\Opcua_Unreal_Client.cpp">
+      <Filter>Source\Opcua_Unreal_Client</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\Opcua_Unreal_Client\Opcua_Unreal_Client.h">
+      <Filter>Source\Opcua_Unreal_Client</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
