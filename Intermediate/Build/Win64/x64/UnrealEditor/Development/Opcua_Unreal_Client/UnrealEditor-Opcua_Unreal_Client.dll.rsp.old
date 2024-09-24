@@ -36,10 +36,11 @@
 /NODEFAULTLIB:"LIBCPD"
 /FUNCTIONPADMIN:6
 "C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\Opcua_Unreal_ClientEditor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.InclOrderOldest.h.obj"
-"C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\UnrealEditor\Development\Opcua_Unreal_Client\MyActor.gen.cpp.obj"
+"C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\UnrealEditor\Development\Opcua_Unreal_Client\MyPlayerController.gen.cpp.obj"
 "C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\UnrealEditor\Development\Opcua_Unreal_Client\Opcua_Unreal_Client.init.gen.cpp.obj"
-"C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\UnrealEditor\Development\Opcua_Unreal_Client\MyActor.cpp.obj"
 "C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\UnrealEditor\Development\Opcua_Unreal_Client\Opcua_Unreal_Client.cpp.obj"
+"C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\UnrealEditor\Development\Opcua_Unreal_Client\MyActor.cpp.obj"
+"C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\UnrealEditor\Development\Opcua_Unreal_Client\MyPlayerController.cpp.obj"
 "C:\Work\Opcua_Unreal_Client\Intermediate\Build\Win64\x64\UnrealEditor\Development\Opcua_Unreal_Client\Default.rc2.res"
 "C:\Work\Opcua_Unreal_Client\Source\Open62541\Lib\open62541.lib"
 "..\Intermediate\Build\Win64\x64\UnrealEditor\Development\UMG\UnrealEditor-UMG.lib"

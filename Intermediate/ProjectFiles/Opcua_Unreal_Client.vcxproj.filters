@@ -11,7 +11,9 @@
     <None Include="..\..\Source\Opcua_Unreal_ClientEditor.Target.cs">
       <Filter>Source</Filter>
     </None>
+    <None Include="..\..\.gitignore" />
     <None Include="..\..\.vsconfig" />
+    <None Include="..\..\README.md" />
     <Filter Include="Config">
       <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
     </Filter>
@@ -30,10 +32,10 @@
     <Filter Include="Source\Opcua_Unreal_Client">
       <UniqueIdentifier>{F52F02DC-B4B6-346A-BFA3-82A809F4521C}</UniqueIdentifier>
     </Filter>
-    <ClCompile Include="..\..\Source\Opcua_Unreal_Client\MyActor.cpp">
+    <ClCompile Include="..\..\Source\Opcua_Unreal_Client\MyPlayerController.cpp">
       <Filter>Source\Opcua_Unreal_Client</Filter>
     </ClCompile>
-    <ClInclude Include="..\..\Source\Opcua_Unreal_Client\MyActor.h">
+    <ClInclude Include="..\..\Source\Opcua_Unreal_Client\MyPlayerController.h">
       <Filter>Source\Opcua_Unreal_Client</Filter>
     </ClInclude>
     <None Include="..\..\Source\Opcua_Unreal_Client\Opcua_Unreal_Client.Build.cs">
