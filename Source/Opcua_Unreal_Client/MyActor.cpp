@@ -60,35 +60,34 @@ void AMyActor::ReadDataFromOpcUa()
     }
 
     // 데이터 읽기 (노드 ID는 변경 필요)
-    UA_Variant value;
-    UA_Variant_init(&value);
-    UA_NodeId nodeId = UA_NODEID_STRING(5, const_cast<char*>("Number"));  // 노드 ID
+    UA_Variant value; // OPC UA에서 다양한 타입의 값을 저장할 수 있는 구조체
+    UA_Variant_init(&value); // 구조체 초기화
+    UA_NodeId nodeId = UA_NODEID_STRING(5, const_cast<char*>("Number"));  // namespace index가 5이고, 노드 ID가 "Number"인 노드
 
-    UA_StatusCode status = UA_Client_readValueAttribute(MyClient, nodeId, &value);
+    UA_StatusCode status = UA_Client_readValueAttribute(MyClient, nodeId, &value); // 특정 노드의 값을 읽고, value에 저장
     if (status == UA_STATUSCODE_GOOD)
     {
         // 실제 타입 확인 및 로그 출력
         UE_LOG(LogTemp, Log, TEXT("Value type received: %s"), *FString(UTF8_TO_TCHAR(value.type->typeName)));
 
-        // Float 타입 처리
-        if (value.type == &UA_TYPES[UA_TYPES_FLOAT])
+        if (value.type == &UA_TYPES[UA_TYPES_FLOAT])        // Float 타입 처리
         {
             float floatValue = *(float*)value.data;
             UE_LOG(LogTemp, Log, TEXT("Value read from OPC UA server: %f"), floatValue);
         }
-        else if (value.type == &UA_TYPES[UA_TYPES_BYTE])
+        else if (value.type == &UA_TYPES[UA_TYPES_BYTE])    //Byte 타입 처리.
         {
             uint8 byteValue = *(uint8*)value.data;
             UE_LOG(LogTemp, Log, TEXT("Value read from OPC UA server (Byte): %d"), byteValue);
         }
-        else
+        else // 나머지
         {
             UE_LOG(LogTemp, Warning, TEXT("Unexpected value type received"));
         }
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to read value: %s"), *FString(UTF8_TO_TCHAR(UA_StatusCode_name(status))));
+        UE_LOG(LogTemp, Error, TEXT("Failed to read value: %s"), *FString(UTF8_TO_TCHAR(UA_StatusCode_name(status)))); // 데이터 읽기가 실패
     }
 
     UA_Variant_clear(&value);  // 메모리 해제
