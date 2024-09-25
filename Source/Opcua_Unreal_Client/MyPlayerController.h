@@ -24,5 +24,5 @@ public:
 
 private:
 	void ConnectToOpcUaServer();
-	void ReadNumberDataFromOpcUa();
+	void ReadMyLevelDataFromOpcUa();
 };

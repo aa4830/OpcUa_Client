@@ -262,6 +262,7 @@
     <ClCompile Include="..\..\Source\Opcua_Unreal_Client\MyPlayerController.cpp">
       <AdditionalIncludeDirectories>$(ClCompile_AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <ClInclude Include="..\..\Source\Opcua_Unreal_Client\MyCustomStruct.h" />
     <ClInclude Include="..\..\Source\Opcua_Unreal_Client\MyPlayerController.h" />
     <None Include="..\..\Source\Opcua_Unreal_Client\Opcua_Unreal_Client.Build.cs" />
     <ClCompile Include="..\..\Source\Opcua_Unreal_Client\Opcua_Unreal_Client.cpp">

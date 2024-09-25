@@ -1,9 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "MyPlayerController.h"
 #include "client.h"  // open62541 클라이언트 헤더
 #include "client_highlevel.h"
-#include "Components/EditableTextBox.h" 
+#include "MyCustomStruct.h"
 #include "Blueprint/UserWidget.h"
 
 AMyPlayerController::AMyPlayerController()
@@ -25,10 +23,9 @@ AMyPlayerController::AMyPlayerController()
 void AMyPlayerController::BeginPlay()
 {
     Super::BeginPlay();
-
-    // OPC UA 서버에 연결
     ConnectToOpcUaServer();
 }
+
 void AMyPlayerController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -38,7 +35,7 @@ void AMyPlayerController::Tick(float DeltaTime)
     Timer += DeltaTime;
     if (Timer >= 1.0f)
     {
-        ReadNumberDataFromOpcUa();
+        ReadMyLevelDataFromOpcUa();
         Timer = 0.0f;  // 타이머 리셋
     }
 }
@@ -53,7 +50,6 @@ void AMyPlayerController::ConnectToOpcUaServer()
         return;
     }
 
-    // 서버에 연결 (서버 URL 변경 필요)
     UA_StatusCode status = UA_Client_connect(MyClient, "opc.tcp://uademo.prosysopc.com:53530/OPCUA/SimulationServer");
     if (status != UA_STATUSCODE_GOOD)
     {
@@ -63,7 +59,7 @@ void AMyPlayerController::ConnectToOpcUaServer()
     }
 }
 
-void AMyPlayerController::ReadNumberDataFromOpcUa()
+void AMyPlayerController::ReadMyLevelDataFromOpcUa()
 {
     if (MyClient == nullptr)
     {
@@ -71,45 +67,84 @@ void AMyPlayerController::ReadNumberDataFromOpcUa()
         return;
     }
 
-    UA_Variant value; // OPC UA에서 다양한 타입의 값을 저장할 수 있는 구조체
-    UA_Variant_init(&value); // 구조체 초기화
-    UA_NodeId nodeId = UA_NODEID_STRING(5, const_cast<char*>("ByteArray"));  // namespace index가 5이고, 노드 ID가 "Number"인 노드
+    TArray<FMyCustomStruct> NodeInfoArray; // 노드 정보를 저장할 배열
 
-    UA_StatusCode status = UA_Client_readValueAttribute(MyClient, nodeId, &value); // 특정 노드의 값을 읽고, value에 저장
-    if (status == UA_STATUSCODE_GOOD)
+    struct FNodeData
     {
-        // 실제 타입 확인 및 로그 출력
-        UE_LOG(LogTemp, Log, TEXT("Value type received: %s"), *FString(UTF8_TO_TCHAR(value.type->typeName)));
+        FString NodeId; // Node ID
+        FString DisplayName; // Display Name
+        FString DataType; // Data Type
+    };
 
-        if (value.type == &UA_TYPES[UA_TYPES_BYTE])    //Byte 타입 처리.
+    FNodeData Nodes[] =
+    {
+        { TEXT("ns=6;s=MyLevel"), TEXT("My Level"), TEXT("double") },
+        { TEXT("ns=6;s=MySwitch"), TEXT("My Switch"), TEXT("boolean") },
+        { TEXT("ns=6;s=Eventid"), TEXT("Eventid"), TEXT("bytestring") },
+        { TEXT("ns=6;s=receivetime"), TEXT("receivetime"), TEXT("datetime") },
+        { TEXT("ns=6;s=severity"), TEXT("severity"), TEXT("uint16") }
+    };
+
+    for (const FNodeData& Node : Nodes)
+    {
+        // NodeIdString을 UTF8 문자열로 변환
+        FString NodeIdString = FString(Node.NodeId); // 노드 ID를 FString으로 생성
+        UA_NodeId nodeId = UA_NODEID_STRING(6, TCHAR_TO_UTF8(*NodeIdString)); // TCHAR를 UTF8로 변환
+
+        // DisplayName 가져오기
+        UA_LocalizedText displayNameResult;
+        UA_StatusCode status = UA_Client_readDisplayNameAttribute(MyClient, nodeId, &displayNameResult);
+        if (status == UA_STATUSCODE_GOOD)
         {
-            uint8 byteValue = *(uint8*)value.data;
-            UEditableTextBox* EditableTextBox = Cast<UEditableTextBox>(MyWidget->GetWidgetFromName(TEXT("EditableTextBox_1")));
-            if (EditableTextBox)
+            FString displayName = UTF8_TO_TCHAR(displayNameResult.text.data);
+            UE_LOG(LogTemp, Log, TEXT("DisplayName: %s"), *displayName);
+
+            // Value 가져오기
+            UA_Variant value;
+            UA_Variant_init(&value); // value 초기화
+            status = UA_Client_readValueAttribute(MyClient, nodeId, &value);
+            FMyCustomStruct NodeInfo;
+            NodeInfo.DisplayName = displayName;
+
+            if (status == UA_STATUSCODE_GOOD)
             {
-                // float 값을 FString으로 변환 후 설정
-                EditableTextBox->SetText(FText::FromString(FString::Printf(TEXT("%f"), byteValue))); // 텍스트 설정
+                // 자료형에 따른 값 읽기
+                if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "double") == 0 && value.type == &UA_TYPES[UA_TYPES_DOUBLE])
+                {
+                    NodeInfo.Value = *(double*)value.data; // Double 값 가져오기
+                }
+                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "boolean") == 0 && value.type == &UA_TYPES[UA_TYPES_BOOLEAN])
+                {
+                    NodeInfo.ValueBool = *(bool*)value.data; // Boolean 값 가져오기
+                }
+                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "bytestring") == 0 && value.type == &UA_TYPES[UA_TYPES_BYTESTRING])
+                {
+                    NodeInfo.ValueByteString = TArray<uint8>((uint8*)value.data, ((UA_ByteString*)value.data)->length);
+                }
+                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "datetime") == 0 && value.type == &UA_TYPES[UA_TYPES_DATETIME])
+                {
+                    NodeInfo.ValueDateTime = *(FDateTime*)value.data; // DateTime 값 가져오기
+                }
+                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "uint16") == 0 && value.type == &UA_TYPES[UA_TYPES_UINT16])
+                {
+                    NodeInfo.ValueUInt16 = *(uint16*)value.data; // UInt16 값 가져오기
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Unsupported data type for node %s"), *displayName);
+                }
             }
-        }
-        else if (value.type == &UA_TYPES[UA_TYPES_INT32]) // Int32 타입 처리
-        {
-            int32 intValue = *(int32*)value.data; // Int32 값 가져오기
-            UEditableTextBox* EditableTextBox = Cast<UEditableTextBox>(MyWidget->GetWidgetFromName(TEXT("EditableTextBox_1")));
-            if (EditableTextBox)
+            else
             {
-                // Int32 값을 FString으로 변환 후 설정
-                EditableTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), intValue))); // 텍스트 설정
+                UE_LOG(LogTemp, Error, TEXT("Failed to read value for node %s: %s"), *displayName, *FString(UTF8_TO_TCHAR(UA_StatusCode_name(status))));
             }
+
+            // FMyNodeInfo 구조체 생성 후 배열에 추가
+            NodeInfoArray.Add(NodeInfo);
         }
-        else // 나머지
+        else
         {
-            UE_LOG(LogTemp, Warning, TEXT("예상하지못한 자료형"));
+            UE_LOG(LogTemp, Error, TEXT("Failed to read display name for node %s: %s"), *Node.NodeId, *FString(UTF8_TO_TCHAR(UA_StatusCode_name(status))));
         }
     }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("데이터 읽기 실패: %s"), *FString(UTF8_TO_TCHAR(UA_StatusCode_name(status))));
-    }
-
-    UA_Variant_clear(&value);  // 메모리 해제
 }

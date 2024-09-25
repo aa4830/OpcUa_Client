@@ -1,0 +1,1 @@
+#include "C:/Work/Opcua_Unreal_Client/Source/Opcua_Unreal_Client/MyCustomStruct.h"
