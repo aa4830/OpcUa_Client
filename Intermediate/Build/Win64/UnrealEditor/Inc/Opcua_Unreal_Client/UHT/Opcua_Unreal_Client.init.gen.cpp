@@ -17,7 +17,7 @@ void EmptyLinkFunctionForGeneratedCodeOpcua_Unreal_Client_init() {}
 				nullptr,
 				0,
 				PKG_CompiledIn | 0x00000000,
-				0xC1AFE0D2,
+				0xAF355893,
 				0x9B3B564F,
 				METADATA_PARAMS(0, nullptr)
 			};
@@ -25,5 +25,5 @@ void EmptyLinkFunctionForGeneratedCodeOpcua_Unreal_Client_init() {}
 		}
 		return Z_Registration_Info_UPackage__Script_Opcua_Unreal_Client.OuterSingleton;
 	}
-	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_Opcua_Unreal_Client(Z_Construct_UPackage__Script_Opcua_Unreal_Client, TEXT("/Script/Opcua_Unreal_Client"), Z_Registration_Info_UPackage__Script_Opcua_Unreal_Client, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0xC1AFE0D2, 0x9B3B564F));
+	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_Opcua_Unreal_Client(Z_Construct_UPackage__Script_Opcua_Unreal_Client, TEXT("/Script/Opcua_Unreal_Client"), Z_Registration_Info_UPackage__Script_Opcua_Unreal_Client, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0xAF355893, 0x9B3B564F));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

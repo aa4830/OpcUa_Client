@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include <common.h>
+#include "MyCustomStruct.h"
 #include "MyPlayerController.generated.h"
 
 UCLASS()
@@ -21,6 +22,12 @@ public:
 	UA_Client* MyClient;
 	UUserWidget* MyWidget;
 	TSubclassOf<UUserWidget> MyWidgetClass;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "My Custom Structs")
+	TArray<FMyCustomStruct> MyStructArray;
+
+	UFUNCTION(BlueprintCallable, Category = "My Functions")
+	void PrintMyStructArray();
 
 private:
 	void ConnectToOpcUaServer();

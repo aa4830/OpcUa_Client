@@ -14,7 +14,11 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define OPCUA_UNREAL_CLIENT_MyPlayerController_generated_h
 
-#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_13_INCLASS_NO_PURE_DECLS \
+#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
+	DECLARE_FUNCTION(execPrintMyStructArray);
+
+
+#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_14_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesAMyPlayerController(); \
 	friend struct Z_Construct_UClass_AMyPlayerController_Statics; \
@@ -23,7 +27,7 @@ public: \
 	DECLARE_SERIALIZER(AMyPlayerController)
 
 
-#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_13_ENHANCED_CONSTRUCTORS \
+#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_14_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	AMyPlayerController(AMyPlayerController&&); \
@@ -35,12 +39,13 @@ public: \
 	NO_API virtual ~AMyPlayerController();
 
 
-#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_10_PROLOG
-#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_13_GENERATED_BODY \
+#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_11_PROLOG
+#define FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_14_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_13_INCLASS_NO_PURE_DECLS \
-	FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_13_ENHANCED_CONSTRUCTORS \
+	FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_14_INCLASS_NO_PURE_DECLS \
+	FID_Work_Opcua_Unreal_Client_Source_Opcua_Unreal_Client_MyPlayerController_h_14_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 

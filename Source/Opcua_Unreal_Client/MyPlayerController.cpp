@@ -1,41 +1,32 @@
 #include "MyPlayerController.h"
 #include "client.h"  // open62541 클라이언트 헤더
 #include "client_highlevel.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "MyCustomStruct.h"
-#include "Blueprint/UserWidget.h"
 
 AMyPlayerController::AMyPlayerController()
 {
     PrimaryActorTick.bCanEverTick = true;
     MyClient = nullptr;  // 클라이언트 초기화
-
-    ConstructorHelpers::FClassFinder<UUserWidget> WidgetClass(TEXT("/Game/Wg_Test"));
-    if (WidgetClass.Succeeded())
-    {
-        MyWidget = CreateWidget<UUserWidget>(GetWorld(), WidgetClass.Class);
-        if (MyWidget)
-        {
-            MyWidget->AddToViewport();
-        }
-    }
 }
 
 void AMyPlayerController::BeginPlay()
 {
     Super::BeginPlay();
     ConnectToOpcUaServer();
+    ReadMyLevelDataFromOpcUa();
+    PrintMyStructArray();
 }
 
 void AMyPlayerController::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    // 데이터 읽기 (1초마다)
+    // 데이터 읽기 (5초마다)
     static float Timer = 0.0f;
     Timer += DeltaTime;
-    if (Timer >= 1.0f)
+    if (Timer >= 5.0f)
     {
-        ReadMyLevelDataFromOpcUa();
         Timer = 0.0f;  // 타이머 리셋
     }
 }
@@ -67,8 +58,6 @@ void AMyPlayerController::ReadMyLevelDataFromOpcUa()
         return;
     }
 
-    TArray<FMyCustomStruct> NodeInfoArray; // 노드 정보를 저장할 배열
-
     struct FNodeData
     {
         FString NodeId; // Node ID
@@ -78,11 +67,11 @@ void AMyPlayerController::ReadMyLevelDataFromOpcUa()
 
     FNodeData Nodes[] =
     {
-        { TEXT("ns=6;s=MyLevel"), TEXT("My Level"), TEXT("double") },
-        { TEXT("ns=6;s=MySwitch"), TEXT("My Switch"), TEXT("boolean") },
-        { TEXT("ns=6;s=Eventid"), TEXT("Eventid"), TEXT("bytestring") },
-        { TEXT("ns=6;s=receivetime"), TEXT("receivetime"), TEXT("datetime") },
-        { TEXT("ns=6;s=severity"), TEXT("severity"), TEXT("uint16") }
+        { TEXT("MyLevel"), TEXT("MyLevel"), TEXT("Double") },
+        { TEXT("MySwitch"), TEXT("MySwitch"), TEXT("Boolean") },
+        { TEXT("MyLevel.Alarm/0:EventId"), TEXT("EventId"), TEXT("ByteString") },
+        { TEXT("MyLevel.Alarm/0:ReceiveTime"), TEXT("ReceiveTime"), TEXT("DateTime") },
+        { TEXT("MyLevel.Alarm/0:Severity"), TEXT("Severity"), TEXT("UInt16") }
     };
 
     for (const FNodeData& Node : Nodes)
@@ -99,6 +88,9 @@ void AMyPlayerController::ReadMyLevelDataFromOpcUa()
             FString displayName = UTF8_TO_TCHAR(displayNameResult.text.data);
             UE_LOG(LogTemp, Log, TEXT("DisplayName: %s"), *displayName);
 
+            // Locale 로그
+            UE_LOG(LogTemp, Log, TEXT("DisplayName Locale: %s"), UTF8_TO_TCHAR(displayNameResult.locale.data));
+
             // Value 가져오기
             UA_Variant value;
             UA_Variant_init(&value); // value 초기화
@@ -109,25 +101,25 @@ void AMyPlayerController::ReadMyLevelDataFromOpcUa()
             if (status == UA_STATUSCODE_GOOD)
             {
                 // 자료형에 따른 값 읽기
-                if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "double") == 0 && value.type == &UA_TYPES[UA_TYPES_DOUBLE])
+                if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "Double") == 0 && value.type == &UA_TYPES[UA_TYPES_DOUBLE])
                 {
-                    NodeInfo.Value = *(double*)value.data; // Double 값 가져오기
+                    NodeInfo.ValueDouble = *(double*)value.data; // Double 값 가져오기
                 }
-                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "boolean") == 0 && value.type == &UA_TYPES[UA_TYPES_BOOLEAN])
+                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "Boolean") == 0 && value.type == &UA_TYPES[UA_TYPES_BOOLEAN])
                 {
                     NodeInfo.ValueBool = *(bool*)value.data; // Boolean 값 가져오기
                 }
-                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "bytestring") == 0 && value.type == &UA_TYPES[UA_TYPES_BYTESTRING])
+                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "ByteString") == 0 && value.type == &UA_TYPES[UA_TYPES_BYTESTRING])
                 {
                     NodeInfo.ValueByteString = TArray<uint8>((uint8*)value.data, ((UA_ByteString*)value.data)->length);
                 }
-                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "datetime") == 0 && value.type == &UA_TYPES[UA_TYPES_DATETIME])
+                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "DateTime") == 0 && value.type == &UA_TYPES[UA_TYPES_DATETIME])
                 {
                     NodeInfo.ValueDateTime = *(FDateTime*)value.data; // DateTime 값 가져오기
                 }
-                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "uint16") == 0 && value.type == &UA_TYPES[UA_TYPES_UINT16])
+                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "UInt16") == 0 && value.type == &UA_TYPES[UA_TYPES_UINT16])
                 {
-                    NodeInfo.ValueUInt16 = *(uint16*)value.data; // UInt16 값 가져오기
+                    NodeInfo.ValueInt32 = *(uint16*)value.data; // UInt16 값 가져오기
                 }
                 else
                 {
@@ -140,7 +132,7 @@ void AMyPlayerController::ReadMyLevelDataFromOpcUa()
             }
 
             // FMyNodeInfo 구조체 생성 후 배열에 추가
-            NodeInfoArray.Add(NodeInfo);
+            MyStructArray.Add(NodeInfo);
         }
         else
         {
@@ -148,3 +140,45 @@ void AMyPlayerController::ReadMyLevelDataFromOpcUa()
         }
     }
 }
+
+void AMyPlayerController::PrintMyStructArray()
+{
+    for (const FMyCustomStruct& Item : MyStructArray)
+    {
+        // 요소의 값을 출력 (예: Item의 특정 속성)
+        FString OutputString;
+
+        // 각 자료형에 따라 적절한 출력 형식 설정
+        if (Item.ValueDouble != 0) // 더블 값이 있을 경우
+        {
+            OutputString = FString::Printf(TEXT("Display Name: %s, Value: %f"), *Item.DisplayName, Item.ValueDouble);
+        }
+        else if (Item.ValueBool) // 불리언 값이 있을 경우
+        {
+            OutputString = FString::Printf(TEXT("Display Name: %s, Value: %s"), *Item.DisplayName, Item.ValueBool ? TEXT("true") : TEXT("false"));
+        }
+        else if (Item.ValueInt32 != 0) // UInt16 값이 있을 경우
+        {
+            OutputString = FString::Printf(TEXT("Display Name: %s, Value: %d"), *Item.DisplayName, Item.ValueInt32);
+        }
+        else if (Item.ValueDateTime != FDateTime::MinValue()) // DateTime 값이 있을 경우
+        {
+            OutputString = FString::Printf(TEXT("Display Name: %s, Value: %s"), *Item.DisplayName, *Item.ValueDateTime.ToString());
+        }
+        else if (Item.ValueByteString.Num() > 0) // ByteString 값이 있을 경우
+        {
+            OutputString = FString::Printf(TEXT("Display Name: %s, Value: [ByteString data]"), *Item.DisplayName);
+        }
+        else
+        {
+            OutputString = FString::Printf(TEXT("Display Name: %s, Value: [Unsupported type]"), *Item.DisplayName);
+        }
+
+        // 로그에 출력
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *OutputString);
+
+        // 화면에 출력 (Blueprint에서 Print String 사용)
+        UKismetSystemLibrary::PrintString(this, OutputString, true, false, FLinearColor::Red, 2.0f);
+    }
+}
+

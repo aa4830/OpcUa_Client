@@ -883,6 +883,8 @@
             "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\um\\ime_cmodes.h",
             "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\ucrt\\assert.h",
             "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\build\\src_generated\\open62541\\nodeids.h",
+            "c:\\work\\opcua_unreal_client\\source\\opcua_unreal_client\\mycustomstruct.h",
+            "c:\\work\\opcua_unreal_client\\intermediate\\build\\win64\\unrealeditor\\inc\\opcua_unreal_client\\uht\\mycustomstruct.generated.h",
             "c:\\work\\opcua_unreal_client\\intermediate\\build\\win64\\unrealeditor\\inc\\opcua_unreal_client\\uht\\myplayercontroller.generated.h"
         ],
         "ImportedModules": [],
