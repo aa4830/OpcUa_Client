@@ -23,12 +23,6 @@ public:
 	UUserWidget* MyWidget;
 	TSubclassOf<UUserWidget> MyWidgetClass;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "My Custom Structs")
-	TArray<FMyCustomStruct> MyStructArray;
-
-	UFUNCTION(BlueprintCallable, Category = "My Functions")
-	void PrintMyStructArray();
-
 private:
 	void ConnectToOpcUaServer();
 	void ReadMyLevelDataFromOpcUa();

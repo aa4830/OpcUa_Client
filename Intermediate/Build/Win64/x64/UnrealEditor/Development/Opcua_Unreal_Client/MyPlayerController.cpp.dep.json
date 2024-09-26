@@ -228,10 +228,7 @@
             "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\include\\open62541\\plugin\\securitypolicy.h",
             "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\include\\open62541\\plugin\\certificategroup.h",
             "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\build\\src_generated\\open62541\\types_generated.h",
-            "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\include\\open62541\\client_highlevel.h",
-            "c:\\program files\\epic games\\ue_5.4\\engine\\source\\runtime\\engine\\classes\\kismet\\kismetsystemlibrary.h",
-            "c:\\program files\\epic games\\ue_5.4\\engine\\source\\runtime\\coreuobject\\public\\uobject\\propertyaccessutil.h",
-            "c:\\program files\\epic games\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\engine\\uht\\kismetsystemlibrary.generated.h"
+            "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\include\\open62541\\client_highlevel.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []

@@ -1,7 +1,6 @@
 #include "MyPlayerController.h"
 #include "client.h"  // open62541 클라이언트 헤더
 #include "client_highlevel.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "MyCustomStruct.h"
 
 AMyPlayerController::AMyPlayerController()
@@ -14,8 +13,6 @@ void AMyPlayerController::BeginPlay()
 {
     Super::BeginPlay();
     ConnectToOpcUaServer();
-    ReadMyLevelDataFromOpcUa();
-    PrintMyStructArray();
 }
 
 void AMyPlayerController::Tick(float DeltaTime)
@@ -25,8 +22,9 @@ void AMyPlayerController::Tick(float DeltaTime)
     // 데이터 읽기 (5초마다)
     static float Timer = 0.0f;
     Timer += DeltaTime;
-    if (Timer >= 5.0f)
+    if (Timer >= 1.0f)
     {
+        ReadMyLevelDataFromOpcUa();
         Timer = 0.0f;  // 타이머 리셋
     }
 }
@@ -58,127 +56,99 @@ void AMyPlayerController::ReadMyLevelDataFromOpcUa()
         return;
     }
 
-    struct FNodeData
+    // MyLevel 값을 읽어와 구조체에 할당
+    UA_NodeId nodeIdMyLevel = UA_NODEID_STRING(6, const_cast<char*>("MyLevel"));
+    UA_Variant valueMyLevel;
+    UA_Variant_init(&valueMyLevel);
+    UA_StatusCode status = UA_Client_readValueAttribute(MyClient, nodeIdMyLevel, &valueMyLevel);
+
+    if (status == UA_STATUSCODE_GOOD && UA_Variant_hasScalarType(&valueMyLevel, &UA_TYPES[UA_TYPES_DOUBLE]))
     {
-        FString NodeId; // Node ID
-        FString DisplayName; // Display Name
-        FString DataType; // Data Type
-    };
+        FMyLevelStruct MyLevel;
+        MyLevel.DisplayName = TEXT("MyLevel");
+        MyLevel.DataType = TEXT("Double");
+        MyLevel.ValueDouble = *(double*)valueMyLevel.data; // Double 값 할당
 
-    FNodeData Nodes[] =
+        UE_LOG(LogTemp, Log, TEXT("%f"), MyLevel.ValueDouble);
+        UE_LOG(LogTemp, Log, TEXT("%s"), *MyLevel.DisplayName); 
+        UE_LOG(LogTemp, Log, TEXT("%s"), *MyLevel.DataType);
+    }
+    else
     {
-        { TEXT("MyLevel"), TEXT("MyLevel"), TEXT("Double") },
-        { TEXT("MySwitch"), TEXT("MySwitch"), TEXT("Boolean") },
-        { TEXT("MyLevel.Alarm/0:EventId"), TEXT("EventId"), TEXT("ByteString") },
-        { TEXT("MyLevel.Alarm/0:ReceiveTime"), TEXT("ReceiveTime"), TEXT("DateTime") },
-        { TEXT("MyLevel.Alarm/0:Severity"), TEXT("Severity"), TEXT("UInt16") }
-    };
+        UE_LOG(LogTemp, Error, TEXT("Failed to read MyLevel value"));
+    }
 
-    for (const FNodeData& Node : Nodes)
+    // MySwitch 값을 읽어와 구조체에 할당
+    UA_NodeId nodeIdMySwitch = UA_NODEID_STRING(6, const_cast<char*>("MySwitch"));
+    UA_Variant valueMySwitch;
+    UA_Variant_init(&valueMySwitch);
+    status = UA_Client_readValueAttribute(MyClient, nodeIdMySwitch, &valueMySwitch);
+
+    if (status == UA_STATUSCODE_GOOD && UA_Variant_hasScalarType(&valueMySwitch, &UA_TYPES[UA_TYPES_BOOLEAN]))
     {
-        // NodeIdString을 UTF8 문자열로 변환
-        FString NodeIdString = FString(Node.NodeId); // 노드 ID를 FString으로 생성
-        UA_NodeId nodeId = UA_NODEID_STRING(6, TCHAR_TO_UTF8(*NodeIdString)); // TCHAR를 UTF8로 변환
+        FMySwitchStruct MySwitch;
+        MySwitch.DisplayName = TEXT("MySwitch");
+        MySwitch.DataType = TEXT("Boolean");
+        MySwitch.ValueBool = *(bool*)valueMySwitch.data; // Boolean 값 할당
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to read MySwitch value"));
+    }
 
-        // DisplayName 가져오기
-        UA_LocalizedText displayNameResult;
-        UA_StatusCode status = UA_Client_readDisplayNameAttribute(MyClient, nodeId, &displayNameResult);
-        if (status == UA_STATUSCODE_GOOD)
-        {
-            FString displayName = UTF8_TO_TCHAR(displayNameResult.text.data);
-            UE_LOG(LogTemp, Log, TEXT("DisplayName: %s"), *displayName);
+    // EventId 값을 읽어와 구조체에 할당
+    UA_NodeId nodeIdEventId = UA_NODEID_STRING(6, const_cast<char*>("MyLevel.Alarm/0:EventId"));
+    UA_Variant valueEventId;
+    UA_Variant_init(&valueEventId);
+    status = UA_Client_readValueAttribute(MyClient, nodeIdEventId, &valueEventId);
 
-            // Locale 로그
-            UE_LOG(LogTemp, Log, TEXT("DisplayName Locale: %s"), UTF8_TO_TCHAR(displayNameResult.locale.data));
+    if (status == UA_STATUSCODE_GOOD && UA_Variant_hasScalarType(&valueEventId, &UA_TYPES[UA_TYPES_BYTESTRING]))
+    {
+        FEventIdStruct EventId;
+        EventId.DisplayName = TEXT("EventId");
+        EventId.DataType = TEXT("ByteString");
+        EventId.ValueByteString = TArray<uint8>((uint8*)valueEventId.data, ((UA_ByteString*)valueEventId.data)->length); // ByteString 값 할당
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to read EventId value"));
+    }
 
-            // Value 가져오기
-            UA_Variant value;
-            UA_Variant_init(&value); // value 초기화
-            status = UA_Client_readValueAttribute(MyClient, nodeId, &value);
-            FMyCustomStruct NodeInfo;
-            NodeInfo.DisplayName = displayName;
+    // ReceiveTime 값을 읽어와 구조체에 할당
+    UA_NodeId nodeIdReceiveTime = UA_NODEID_STRING(6, const_cast<char*>("MyLevel.Alarm/0:ReceiveTime"));
+    UA_Variant valueReceiveTime;
+    UA_Variant_init(&valueReceiveTime);
+    status = UA_Client_readValueAttribute(MyClient, nodeIdReceiveTime, &valueReceiveTime);
 
-            if (status == UA_STATUSCODE_GOOD)
-            {
-                // 자료형에 따른 값 읽기
-                if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "Double") == 0 && value.type == &UA_TYPES[UA_TYPES_DOUBLE])
-                {
-                    NodeInfo.ValueDouble = *(double*)value.data; // Double 값 가져오기
-                }
-                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "Boolean") == 0 && value.type == &UA_TYPES[UA_TYPES_BOOLEAN])
-                {
-                    NodeInfo.ValueBool = *(bool*)value.data; // Boolean 값 가져오기
-                }
-                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "ByteString") == 0 && value.type == &UA_TYPES[UA_TYPES_BYTESTRING])
-                {
-                    NodeInfo.ValueByteString = TArray<uint8>((uint8*)value.data, ((UA_ByteString*)value.data)->length);
-                }
-                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "DateTime") == 0 && value.type == &UA_TYPES[UA_TYPES_DATETIME])
-                {
-                    NodeInfo.ValueDateTime = *(FDateTime*)value.data; // DateTime 값 가져오기
-                }
-                else if (strcmp(TCHAR_TO_UTF8(*Node.DataType), "UInt16") == 0 && value.type == &UA_TYPES[UA_TYPES_UINT16])
-                {
-                    NodeInfo.ValueInt32 = *(uint16*)value.data; // UInt16 값 가져오기
-                }
-                else
-                {
-                    UE_LOG(LogTemp, Warning, TEXT("Unsupported data type for node %s"), *displayName);
-                }
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to read value for node %s: %s"), *displayName, *FString(UTF8_TO_TCHAR(UA_StatusCode_name(status))));
-            }
+    if (status == UA_STATUSCODE_GOOD && UA_Variant_hasScalarType(&valueReceiveTime, &UA_TYPES[UA_TYPES_DATETIME]))
+    {
+        FReciveTimeStruct ReceiveTime;
+        ReceiveTime.DisplayName = TEXT("ReceiveTime");
+        ReceiveTime.DataType = TEXT("DateTime");
+        ReceiveTime.ValueDateTime = *(FDateTime*)valueReceiveTime.data; // DateTime 값 할당
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to read ReceiveTime value"));
+    }
 
-            // FMyNodeInfo 구조체 생성 후 배열에 추가
-            MyStructArray.Add(NodeInfo);
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("Failed to read display name for node %s: %s"), *Node.NodeId, *FString(UTF8_TO_TCHAR(UA_StatusCode_name(status))));
-        }
+    // Severity 값을 읽어와 구조체에 할당
+    UA_NodeId nodeIdSeverity = UA_NODEID_STRING(6, const_cast<char*>("MyLevel.Alarm/0:Severity"));
+    UA_Variant valueSeverity;
+    UA_Variant_init(&valueSeverity);
+    status = UA_Client_readValueAttribute(MyClient, nodeIdSeverity, &valueSeverity);
+
+    if (status == UA_STATUSCODE_GOOD && UA_Variant_hasScalarType(&valueSeverity, &UA_TYPES[UA_TYPES_UINT16]))
+    {
+        FSeverityStruct Severity;
+        Severity.DisplayName = TEXT("Severity");
+        Severity.DataType = TEXT("UInt16");
+        Severity.ValueInt32 = *(uint16*)valueSeverity.data; // UInt16 값 할당 (int32로 변환)
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to read Severity value"));
     }
 }
 
-void AMyPlayerController::PrintMyStructArray()
-{
-    for (const FMyCustomStruct& Item : MyStructArray)
-    {
-        // 요소의 값을 출력 (예: Item의 특정 속성)
-        FString OutputString;
-
-        // 각 자료형에 따라 적절한 출력 형식 설정
-        if (Item.ValueDouble != 0) // 더블 값이 있을 경우
-        {
-            OutputString = FString::Printf(TEXT("Display Name: %s, Value: %f"), *Item.DisplayName, Item.ValueDouble);
-        }
-        else if (Item.ValueBool) // 불리언 값이 있을 경우
-        {
-            OutputString = FString::Printf(TEXT("Display Name: %s, Value: %s"), *Item.DisplayName, Item.ValueBool ? TEXT("true") : TEXT("false"));
-        }
-        else if (Item.ValueInt32 != 0) // UInt16 값이 있을 경우
-        {
-            OutputString = FString::Printf(TEXT("Display Name: %s, Value: %d"), *Item.DisplayName, Item.ValueInt32);
-        }
-        else if (Item.ValueDateTime != FDateTime::MinValue()) // DateTime 값이 있을 경우
-        {
-            OutputString = FString::Printf(TEXT("Display Name: %s, Value: %s"), *Item.DisplayName, *Item.ValueDateTime.ToString());
-        }
-        else if (Item.ValueByteString.Num() > 0) // ByteString 값이 있을 경우
-        {
-            OutputString = FString::Printf(TEXT("Display Name: %s, Value: [ByteString data]"), *Item.DisplayName);
-        }
-        else
-        {
-            OutputString = FString::Printf(TEXT("Display Name: %s, Value: [Unsupported type]"), *Item.DisplayName);
-        }
-
-        // 로그에 출력
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *OutputString);
-
-        // 화면에 출력 (Blueprint에서 Print String 사용)
-        UKismetSystemLibrary::PrintString(this, OutputString, true, false, FLinearColor::Red, 2.0f);
-    }
-}
 

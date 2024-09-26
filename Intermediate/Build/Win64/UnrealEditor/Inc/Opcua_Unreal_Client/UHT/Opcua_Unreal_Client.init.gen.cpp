@@ -17,13 +17,13 @@ void EmptyLinkFunctionForGeneratedCodeOpcua_Unreal_Client_init() {}
 				nullptr,
 				0,
 				PKG_CompiledIn | 0x00000000,
-				0xAF355893,
-				0x9B3B564F,
+				0x06E6FCBD,
+				0x9AEA9918,
 				METADATA_PARAMS(0, nullptr)
 			};
 			UECodeGen_Private::ConstructUPackage(Z_Registration_Info_UPackage__Script_Opcua_Unreal_Client.OuterSingleton, PackageParams);
 		}
 		return Z_Registration_Info_UPackage__Script_Opcua_Unreal_Client.OuterSingleton;
 	}
-	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_Opcua_Unreal_Client(Z_Construct_UPackage__Script_Opcua_Unreal_Client, TEXT("/Script/Opcua_Unreal_Client"), Z_Registration_Info_UPackage__Script_Opcua_Unreal_Client, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0xAF355893, 0x9B3B564F));
+	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_Opcua_Unreal_Client(Z_Construct_UPackage__Script_Opcua_Unreal_Client, TEXT("/Script/Opcua_Unreal_Client"), Z_Registration_Info_UPackage__Script_Opcua_Unreal_Client, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0x06E6FCBD, 0x9AEA9918));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
