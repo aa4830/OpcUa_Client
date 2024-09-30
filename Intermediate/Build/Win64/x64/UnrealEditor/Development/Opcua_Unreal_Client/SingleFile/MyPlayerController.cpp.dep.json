@@ -902,7 +902,11 @@
             "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\include\\open62541\\plugin\\securitypolicy.h",
             "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\include\\open62541\\plugin\\certificategroup.h",
             "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\build\\src_generated\\open62541\\types_generated.h",
-            "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\include\\open62541\\client_highlevel.h"
+            "c:\\work\\opcua_unreal_client\\source\\open62541\\include\\include\\open62541\\client_highlevel.h",
+            "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\ucrt\\process.h",
+            "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\ucrt\\corecrt_startup.h",
+            "c:\\program files (x86)\\windows kits\\10\\include\\10.0.26100.0\\ucrt\\math.h",
+            "c:\\program files\\microsoft visual studio\\2022\\community\\vc\\tools\\msvc\\14.38.33130\\include\\vcruntime_startup.h"
         ],
         "ImportedModules": [],
         "ImportedHeaderUnits": []
